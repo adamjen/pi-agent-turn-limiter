@@ -20,11 +20,17 @@
  *
  * ## Configuration
  *
- * Set `AGENT_TURN_LIMIT` env var to change the default (10):
+ * Set env vars to customize:
  *
  * ```bash
- * export AGENT_TURN_LIMIT=15
+ * export AGENT_TURN_LIMIT=10    # Total turns before blocking (default: 7)
+ * export AGENT_GRACE_TURNS=5    # Grace period — no counting during setup (default: 3)
  * ```
+ *
+ * **Example:** With defaults (limit=7, grace=3), the orchestrator gets:
+ * - Turns 1-3: Grace period (reading context, understanding task)
+ * - Turns 4-7: Countdown starts — must delegate or get blocked
+ * - Turn 8+: Blocked unless subagent was spawned
  *
  * ## Usage
  *
@@ -53,6 +59,7 @@
  */
 export default function (pi: any): void {
   const LIMIT = parseInt(process.env.AGENT_TURN_LIMIT, 10) || 7;
+  const GRACE = parseInt(process.env.AGENT_GRACE_TURNS, 10) || 3;
   let turnCount = 0;
   let blocked = false;
 
@@ -70,7 +77,7 @@ export default function (pi: any): void {
     if (ctx.ui) {
       ctx.ui.setStatus(
         "turn-limiter",
-        `🔄 turn-limiter active (limit: ${LIMIT})`
+        `🔄 turn-limiter active (${LIMIT} limit, ${GRACE} grace)`
       );
     }
   });
@@ -93,15 +100,21 @@ export default function (pi: any): void {
 
   /**
    * Fired at the end of each LLM turn.
-   * Increments the counter.
+   * Increments the counter. Grace turns don't count toward the limit.
    */
   pi.on("turn_end", async (_event: any, ctx: any) => {
     turnCount++;
+    const effectiveTurns = Math.max(0, turnCount - GRACE);
+
     if (ctx.ui) {
-      const status =
-        turnCount >= LIMIT
-          ? `🚫 ${turnCount}/${LIMIT} — DELEGATE NOW`
-          : `🔄 ${turnCount}/${LIMIT}`;
+      let status: string;
+      if (turnCount <= GRACE) {
+        status = `🟢 ${turnCount}/${GRACE} grace`;
+      } else if (effectiveTurns >= LIMIT) {
+        status = `🚫 ${effectiveTurns}/${LIMIT} — DELEGATE NOW`;
+      } else {
+        status = `🔄 ${effectiveTurns}/${LIMIT} (${turnCount} total)`;
+      }
       ctx.ui.setStatus("turn-limiter", status);
     }
   });
@@ -117,6 +130,7 @@ export default function (pi: any): void {
    */
   pi.on("tool_call", async (event: any, ctx: any) => {
     const delegationTools = ["subagent", "TaskExecute", "TaskCreate", "TaskUpdate"];
+    const effectiveTurns = Math.max(0, turnCount - GRACE);
 
     // If a delegation tool is being called, reset and allow
     if (delegationTools.includes(event.toolName)) {
@@ -128,15 +142,15 @@ export default function (pi: any): void {
       return undefined;
     }
 
-    // If over limit, block everything else
-    if (turnCount >= LIMIT && !blocked) {
+    // If over limit (after grace), block everything else
+    if (effectiveTurns >= LIMIT && !blocked) {
       blocked = true;
     }
 
-    if (blocked && turnCount >= LIMIT) {
+    if (blocked && effectiveTurns >= LIMIT) {
       return {
         block: true,
-        reason: `ORCHESTRATOR LIMIT REACHED (${turnCount}/${LIMIT} turns without delegation). ` +
+        reason: `ORCHESTRATOR LIMIT REACHED (${effectiveTurns}/${LIMIT} turns without delegation, ${turnCount} total). ` +
           `STOP working directly. Create a task with TaskCreate and delegate to a subagent via subagent() or TaskExecute. ` +
           `You have been doing the work yourself for ${turnCount} turns — delegate now.`,
       };

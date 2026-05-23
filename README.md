@@ -10,7 +10,7 @@ This is especially bad with local models that have weaker instruction following 
 
 ## The Solution
 
-A tiny extension that counts turns. After **7 turns** (configurable) without the orchestrator spawning a subagent, it blocks ALL tool calls except `subagent` and `TaskExecute`. The orchestrator MUST delegate or it can't proceed.
+A tiny extension that counts turns. After **3 grace turns** (for setup), then **7 working turns** without the orchestrator spawning a subagent, it blocks ALL tool calls except `subagent` and `TaskExecute`. The orchestrator MUST delegate or it can't proceed.
 
 ## Install
 
@@ -28,11 +28,12 @@ export AGENT_TURN_LIMIT=15
 
 ## How It Works
 
-1. **Session starts** → counter resets to 0, status bar shows `🔄 0/7`
-2. **Each turn ends** → counter increments (`🔄 3/7`, `🔄 4/7`...)
-3. **Orchestrator spawns subagent** → counter resets to 0, shows `🔄 0/7 ✓ delegated`
-4. **Counter hits limit** → status turns red: `🚫 7/7 — DELEGATE NOW`
-5. **Next tool call blocked** → returns error: `"ORCHESTRATOR LIMIT REACHED (7/7 turns without delegation). STOP working directly. Create a task and delegate to a subagent."`
+1. **Session starts** → grace period begins, status bar shows `🟢 0/3 grace`
+2. **Grace turns (1-3)** → free turns for setup, reading context, planning
+3. **Countdown starts (turn 4+)** → shows `🔄 1/7 (4 total)`, `🔄 2/7 (5 total)`...
+4. **Orchestrator spawns subagent** → counter resets to 0, shows `🔄 0/7 ✓ delegated`
+5. **Counter hits limit** → status turns red: `🚫 7/7 — DELEGATE NOW`
+6. **Next tool call blocked** → returns error: `"ORCHESTRATOR LIMIT REACHED (7/7 turns without delegation, 10 total). STOP working directly. Create a task and delegate to a subagent."`
 
 ## Status Bar
 
