@@ -17,6 +17,8 @@ Install with: `pi install npm:@adamjen/pi-agent-turn-limiter`
 
 Pairs well with my other extension [`@adamjen/pi-one-subagent-at-a-time`](https://www.npmjs.com/package/@adamjen/pi-one-subagent-at-a-time) — one forces delegation, the other prevents parallel spawns on single-GPU setups.
 
+- **pi Gallery:** [pi.dev/packages/@adamjen/pi-agent-turn-limiter?name=adamjen](https://pi.dev/packages/@adamjen/pi-agent-turn-limiter?name=adamjen)
+
 Pairs with [`HazAT/pi-interactive-subagents`](https://github.com/HazAT/pi-interactive-subagents) for interactive subagent management.
 
 Happy to take questions or PRs.

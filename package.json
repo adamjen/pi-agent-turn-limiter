@@ -3,17 +3,26 @@
   "version": "0.1.2",
   "description": "Forces the pi orchestrator to delegate to a subagent after N turns — prevents getting stuck in endless work loops.",
   "main": "extensions/agent-turn-limiter.ts",
-  "keywords": ["pi-package", "pi-extension", "subagent", "orchestrator", "turn-limit", "delegation"],
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "subagent",
+    "orchestrator",
+    "turn-limit",
+    "delegation"
+  ],
   "author": "Adam",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adamjen/pi-agent-turn-limiter.git"
+    "url": "git+https://github.com/adamjen/pi-agent-turn-limiter.git"
   },
   "bugs": "https://github.com/adamjen/pi-agent-turn-limiter/issues",
   "homepage": "https://github.com/adamjen/pi-agent-turn-limiter#readme",
   "pi": {
-    "extensions": ["extensions/agent-turn-limiter.ts"],
+    "extensions": [
+      "extensions/agent-turn-limiter.ts"
+    ],
     "image": "https://raw.githubusercontent.com/adamjen/pi-agent-turn-limiter/master/screenshot.png"
   }
 }

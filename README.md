@@ -50,6 +50,8 @@ Shows real-time turn count in the pi TUI footer:
 - **[`@adamjen/pi-one-subagent-at-a-time`](https://www.npmjs.com/package/@adamjen/pi-one-subagent-at-a-time)** — prevents parallel subagent spawns on single-GPU setups. One forces delegation, the other prevents melting.
 - **[`HazAT/pi-interactive-subagents`](https://github.com/HazAT/pi-interactive-subagents)** — interactive subagent management for advanced control.
 
+**Browse all my pi packages:** [pi.dev/packages/@adamjen/pi-agent-turn-limiter?name=adamjen](https://pi.dev/packages/@adamjen/pi-agent-turn-limiter?name=adamjen)
+
 ## Why This Exists
 
 Built because my local Qwen3.6-27B orchestrator would spend 30+ turns reading files and writing content directly instead of spawning the `researcher` or `coder` subagents. After the 5th time I had to manually interrupt it, I wrote this extension. Now it delegates on the first try every time.
