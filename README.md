@@ -47,7 +47,8 @@ Shows real-time turn count in the pi TUI footer:
 
 ## Pair With
 
-Works great alongside [`@adamjen/pi-one-subagent-at-a-time`](https://www.npmjs.com/package/@adamjen/pi-one-subagent-at-a-time) — one forces delegation, the other prevents parallel spawns. Together they keep your orchestrator honest and your GPU from melting.
+- **[`@adamjen/pi-one-subagent-at-a-time`](https://www.npmjs.com/package/@adamjen/pi-one-subagent-at-a-time)** — prevents parallel subagent spawns on single-GPU setups. One forces delegation, the other prevents melting.
+- **[`HazAT/pi-interactive-subagents`](https://github.com/HazAT/pi-interactive-subagents)** — interactive subagent management for advanced control.
 
 ## Why This Exists
 

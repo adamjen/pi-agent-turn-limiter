@@ -47,6 +47,11 @@
  *   { name: "agent-turn-limiter", path: "./extensions/agent-turn-limiter.ts" }
  * ]
  * ```
+ *
+ * ## Pair With
+ *
+ * - [`@adamjen/pi-one-subagent-at-a-time`](https://www.npmjs.com/package/@adamjen/pi-one-subagent-at-a-time) — prevents parallel spawns
+ * - [`HazAT/pi-interactive-subagents`](https://github.com/HazAT/pi-interactive-subagents) — interactive subagent management
  */
 
 /**
