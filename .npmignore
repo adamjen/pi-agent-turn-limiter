@@ -1,0 +1,12 @@
+# Dev files
+design/
+research/
+*.log
+reddit-post.md
+
+# Pi internals
+.pi/
+
+# Git
+.git/
+.gitignore
