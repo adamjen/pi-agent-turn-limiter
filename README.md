@@ -53,6 +53,20 @@ Shows real-time turn count in the pi TUI footer:
 
 **Browse all my pi packages:** [pi.dev/packages/@adamjen/pi-agent-turn-limiter?name=adamjen](https://pi.dev/packages/@adamjen/pi-agent-turn-limiter?name=adamjen)
 
+## What Changed in v3
+
+**v3.0.0 — Simplified to orchestrator-only warning (no hard block)**
+- Removed the complex 7-turn hard block system
+- Now warns after 3 grace + 3 effective turns (6 total) instead of blocking at 7
+- Simpler detection: checks for `subagent` tool in agent config
+- No more per-agent turn maps — single counter for orchestrator
+- Warning injected via system prompt — never blocks tool calls
+
+**v3.0.1 — Clean npm publish**
+- Added `files` field to package.json for clean publishes (no junk files)
+- Removed accidentally committed `.npmignore` and `provider-payload.log`
+- Package now publishes only: README.md, extensions/, package.json, screenshot.png
+
 ## Why This Exists
 
 Built because my local Qwen3.6-27B orchestrator would spend 30+ turns reading files and writing content directly instead of spawning the `researcher` or `coder` subagents. After the 5th time I had to manually interrupt it, I wrote this extension. Now it delegates on the first try every time.
