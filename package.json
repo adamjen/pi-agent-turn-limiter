@@ -1,6 +1,12 @@
 {
   "name": "@adamjen/pi-agent-turn-limiter",
-  "version": "3.0.0",
+  "files": [
+    "extensions/",
+    "package.json",
+    "README.md",
+    "screenshot.png"
+  ],
+  "version": "3.0.1",
   "description": "Warns the pi orchestrator to delegate after 3 turns — prevents getting stuck in endless work loops",
   "main": "extensions/agent-turn-limiter.ts",
   "keywords": [
