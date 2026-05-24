@@ -1,7 +1,7 @@
 {
   "name": "@adamjen/pi-agent-turn-limiter",
-  "version": "0.1.3",
-  "description": "Forces the pi orchestrator to delegate to a subagent after N turns — prevents getting stuck in endless work loops.",
+  "version": "3.0.0",
+  "description": "Warns the pi orchestrator to delegate after 3 turns — prevents getting stuck in endless work loops",
   "main": "extensions/agent-turn-limiter.ts",
   "keywords": [
     "pi-package",

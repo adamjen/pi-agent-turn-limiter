@@ -1,6 +1,6 @@
 # @adamjen/pi-agent-turn-limiter
 
-**Forces the pi orchestrator to delegate to a subagent after N turns — prevents getting stuck in endless work loops.**
+**Warns the pi orchestrator to delegate after 3 turns — prevents getting stuck in endless work loops.**
 
 ## The Problem
 
@@ -10,7 +10,7 @@ This is especially bad with local models that have weaker instruction following 
 
 ## The Solution
 
-A tiny extension that counts turns. After **3 grace turns** (for setup), then **7 working turns** without the orchestrator spawning a subagent, it blocks ALL tool calls except `subagent` and `TaskExecute`. The orchestrator MUST delegate or it can't proceed.
+A tiny extension (~80 lines) that counts orchestrator turns. After **3 grace turns** (for setup), then **3 working turns** without delegating, it injects a warning prompt into the system context. **No hard block — just a reminder.**
 
 ## Install
 
@@ -18,32 +18,33 @@ A tiny extension that counts turns. After **3 grace turns** (for setup), then **
 pi install npm:@adamjen/pi-agent-turn-limiter
 ```
 
-## Configure
-
-Change the turn limit (default 7):
-
-```bash
-export AGENT_TURN_LIMIT=15
-```
-
 ## How It Works
 
-1. **Session starts** → grace period begins, status bar shows `🟢 0/3 grace`
+1. **Session starts** → detects orchestrator (via `subagent` tool), status bar shows `🟢 orch: 0/3 grace`
 2. **Grace turns (1-3)** → free turns for setup, reading context, planning
-3. **Countdown starts (turn 4+)** → shows `🔄 1/7 (4 total)`, `🔄 2/7 (5 total)`...
-4. **Orchestrator spawns subagent** → counter resets to 0, shows `🔄 0/7 ✓ delegated`
-5. **Counter hits limit** → status turns red: `🚫 7/7 — DELEGATE NOW`
-6. **Next tool call blocked** → returns error: `"ORCHESTRATOR LIMIT REACHED (7/7 turns without delegation, 10 total). STOP working directly. Create a task and delegate to a subagent."`
+3. **Countdown starts (turn 4+)** → shows `🔄 orch: 1/3`, `🔄 orch: 2/3`...
+4. **Orchestrator spawns subagent** → counter resets to 0, shows `🔄 orch: 0/3 ✓ delegated`
+5. **Counter hits limit (turn 6)** → status turns yellow: `⚠️ orch: 3/3 — delegate now`
+6. **Warning injected** → system prompt gets: `⚠️ DELEGATION REMINDER: You have used 3 of 3 allowed turns without delegating...`
 
 ## Status Bar
 
 Shows real-time turn count in the pi TUI footer:
 
 ```
-🔄 3/7          # Normal — under limit
-🔄 0/7 ✓ delegated  # Reset after subagent spawn
-🚫 7/7 — DELEGATE NOW  # Limit reached, blocking tools
+🔄 orch: 2/3          # Normal — under limit
+🔄 orch: 0/3 ✓ delegated  # Reset after subagent spawn
+⚠️ orch: 3/3 — delegate now  # Warning injected (soft nudge)
+🔵 turn-limiter: not orchestrator  # Specialist agent (ignored)
 ```
+
+## Design Decisions
+
+**Why no hard block?** The orchestrator sometimes needs extra turns for complex coordination. A warning is sufficient — if it ignores the warning, context will run out naturally.
+
+**Why orchestrator-only?** Specialist agents (`researcher`, `coder`, etc.) have their own `max_turns` from frontmatter. They don't need this limiter — they just run until context runs out.
+
+**Why 3 grace + 3 effective?** 3 turns lets the orchestrator read context and plan. Then 3 more turns for actual work before nudging delegation. Total: 6 turns before warning.
 
 ## Pair With
 
